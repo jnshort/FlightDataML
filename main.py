@@ -1,6 +1,5 @@
 import pandas as pd 
-import numpy as np
-import matplotlib.pyplot as plt
+import sys
 from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import PolynomialFeatures, StandardScaler
 
@@ -24,20 +23,24 @@ if __name__ == "__main__":
     model = LinearRegression()
     model.fit(X_scaled, y)
 
-    # Get altitude input from user
-    alt = int(input("Enter altitude in feet: "))
-
-    # Validate user input
+    # Validate the altitude
     try:
-        alt = int(alt)
+        alt = sys.argv[1]
+        alt = float(alt)
+        if alt < 0:
+            print("Altitude must be positive")
+            sys.exit(1)
+        if alt > 50000:
+            print("Insuffient training data\nAltitude must be less than 50,000 ft")
+            sys.exit(1)
+    except IndexError:
+        print("Please provide an altitude")
+        sys.exit(1)
     except ValueError:
-        print("Invalid altitude")
-        exit()
-    if alt < 0:
-        print("Invalid altitude")
-        exit()
+        print("Altitude must be a number")
+        sys.exit(1)
 
     alt_poly = poly.transform([[alt]])
     alt_scaled = scaler.transform(alt_poly)
     mph = model.predict(alt_scaled)
-    print(f"Predicted speed at {alt} ft: {mph[0][0]} mph")
+    print(f"Predicted speed at {alt} ft: {mph[0][0]:.2f} mph")
